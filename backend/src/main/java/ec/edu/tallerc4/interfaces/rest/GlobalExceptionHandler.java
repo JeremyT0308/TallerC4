@@ -1,6 +1,7 @@
 package ec.edu.tallerc4.interfaces.rest;
 
 import ec.edu.tallerc4.application.ResourceNotFoundException;
+import ec.edu.tallerc4.application.BadGatewayException;
 import ec.edu.tallerc4.application.ServiceUnavailableException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiError> notFound(ResourceNotFoundException ex, HttpServletRequest request) {
         return response("NOT_FOUND", ex.getMessage(), HttpStatus.NOT_FOUND, request);
+    }
+
+    @ExceptionHandler(BadGatewayException.class)
+    public ResponseEntity<ApiError> badGateway(BadGatewayException ex, HttpServletRequest request) {
+        return response("BAD_GATEWAY", ex.getMessage(), HttpStatus.BAD_GATEWAY, request);
     }
 
     @ExceptionHandler(ServiceUnavailableException.class)

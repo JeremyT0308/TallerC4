@@ -52,6 +52,7 @@ paths:
           description: Resultado vivo, simulado o stale elegible
           content: { application/json: { schema: { $ref: '#/components/schemas/AntPoints' } } }
         '400': { $ref: '#/components/responses/ValidationError' }
+        '502': { $ref: '#/components/responses/BadGateway' }
         '503': { $ref: '#/components/responses/Unavailable' }
 components:
   parameters:
@@ -116,4 +117,7 @@ components:
       content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
     Unavailable:
       description: Proveedor no disponible y sin fallback elegible
+      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+    BadGateway:
+      description: Proveedor upstream devolvió HTTP 502 y no existe fallback elegible
       content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }

@@ -2,6 +2,7 @@ package ec.edu.tallerc4.interfaces.rest;
 
 import ec.edu.tallerc4.application.AntPointsResponse;
 import ec.edu.tallerc4.application.AntPointsService;
+import ec.edu.tallerc4.domain.InputValidator;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,6 +15,7 @@ public class AntController {
     @GetMapping("/points")
     public AntPointsResponse points(@RequestParam String identification,
                                     @RequestParam(required = false) String scenario) {
-        return scenario == null ? service.query(identification) : service.query(identification, scenario);
+        String normalizedIdentification = InputValidator.requireIdentification(identification);
+        return scenario == null ? service.query(normalizedIdentification) : service.query(normalizedIdentification, scenario);
     }
 }

@@ -1,9 +1,11 @@
 package ec.edu.tallerc4.infrastructure.ant;
 
 import ec.edu.tallerc4.application.AntProvider;
+import ec.edu.tallerc4.application.BadGatewayException;
 import ec.edu.tallerc4.application.ServiceUnavailableException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -37,6 +39,11 @@ public class RealAntAdapter implements AntProvider {
             Matcher license = LICENSE.matcher(body);
             return new AntProviderResult(identification, value, license.find() ? license.group(1) : null,
                     false, false, "ANT", null);
+        } catch (RestClientResponseException ex) {
+            if (ex.getStatusCode().value() == 502) {
+                throw new BadGatewayException("El portal ANT devolvió HTTP 502 Bad Gateway.", ex);
+            }
+            throw new ServiceUnavailableException("El portal ANT no está disponible o requiere autorización.", ex);
         } catch (RestClientException ex) {
             throw new ServiceUnavailableException("El portal ANT no está disponible o requiere autorización.", ex);
         }

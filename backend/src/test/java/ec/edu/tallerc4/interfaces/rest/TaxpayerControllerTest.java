@@ -1,6 +1,7 @@
 package ec.edu.tallerc4.interfaces.rest;
 
 import ec.edu.tallerc4.application.TaxpayerService;
+import ec.edu.tallerc4.application.ResourceNotFoundException;
 import ec.edu.tallerc4.domain.TaxpayerDetails;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,5 +44,21 @@ class TaxpayerControllerTest {
                 .andExpect(jsonPath("$.message").value("El RUC debe tener 13 dígitos y una estructura ecuatoriana válida."));
 
         verifyNoInteractions(service);
+    }
+
+    @Test
+    void returnsStructured404WhenTaxpayerDoesNotExist() throws Exception {
+        when(service.find("1790016919001", "persona@example.com"))
+                .thenThrow(new ResourceNotFoundException("No se encontró un contribuyente para el RUC indicado."));
+
+        mvc.perform(get("/api/v1/taxpayers/1790016919001")
+                        .param("email", "persona@example.com")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("NOT_FOUND"))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("No se encontró un contribuyente para el RUC indicado."))
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.path").value("/api/v1/taxpayers/1790016919001"));
     }
 }

@@ -83,7 +83,7 @@ El archivo `.env.example` contiene la configuración completa y no incluye secre
 - `GET /api/v1/vehicles/{plate}`
 - `GET /api/v1/ant/points?identification=...&scenario=...`
 
-El contrato detallado está en [`docs/contracts/openapi.yaml`](docs/contracts/openapi.yaml). El inventario C4, las decisiones, el protocolo de usabilidad, la verificación Redis y el checklist de evidencia están en `docs/architecture/`, `docs/usability/` y `docs/evidence/`.
+El contrato detallado está en [`docs/contracts/openapi.yaml`](docs/contracts/openapi.yaml). La matriz de verificación HTTP de rutas, validaciones y errores está en [`docs/evidence/api-http-verification.md`](docs/evidence/api-http-verification.md). El inventario C4, las decisiones, el protocolo de usabilidad, la verificación Redis y el checklist de evidencia están en `docs/architecture/`, `docs/usability/` y `docs/evidence/`.
 
 Con backend y frontend locales activos, la verificación de navegador se ejecuta con `npm run e2e:usability`. Genera el reporte automatizado y las capturas reales bajo `docs/evidence/screenshots/`. Un PASS automatizado no equivale a resultados de participantes humanos.
 

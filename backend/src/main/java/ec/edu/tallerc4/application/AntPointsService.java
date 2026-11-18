@@ -56,6 +56,9 @@ public class AntPointsService {
                         value.retrievedAt(), staleSince,
                         "Resultado recuperado de cache ANT; la consulta en vivo falló.");
             }
+            if (providerFailure instanceof BadGatewayException) {
+                throw new BadGatewayException("ANT no está disponible y no existe un resultado ANT utilizable.", providerFailure);
+            }
             throw new ServiceUnavailableException("ANT no está disponible y no existe un resultado ANT utilizable.", providerFailure);
         }
     }

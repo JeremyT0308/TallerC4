@@ -68,6 +68,18 @@ class AntPointsCacheTest {
     }
 
     @Test
+    void preservesBadGatewayStatusWhenNoCacheIsEligible() {
+        RecordingProvider provider = new RecordingProvider(new BadGatewayException("ANT upstream devolvió HTTP 502 Bad Gateway."));
+        AntPointsService service = new AntPointsService(Optional.of(provider), Optional.of(new RecordingCache()),
+                new AntCachePolicy(Duration.ofMinutes(15), Duration.ofDays(7)), () -> NOW);
+
+        BadGatewayException error = assertThrows(BadGatewayException.class,
+                () -> service.query("0912576287"));
+
+        assertTrue(error.getMessage().contains("no existe un resultado ANT utilizable"));
+    }
+
+    @Test
     void returnsLiveResultWhenCacheWriteFails() {
         RecordingProvider provider = new RecordingProvider(new AntProviderResult("0912576287", 30.0, "B", false, false, "ANT", null));
         RecordingCache cache = new RecordingCache();
