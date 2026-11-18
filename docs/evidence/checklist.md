@@ -30,6 +30,15 @@ npm test -- --run
 npm run build
 ```
 
+La ejecución automatizada de navegador se lanza con el backend y frontend locales activos:
+
+```powershell
+cd frontend
+npm run e2e:usability
+```
+
+El reporte generado queda en `docs/evidence/automated-browser-report.md` y las capturas en `docs/evidence/screenshots/`. PASS automatizado no significa estudio humano completado.
+
 ## Matriz de procedencia
 
 | Evidencia | Fuente declarada | ¿Permite afirmar dato oficial? |

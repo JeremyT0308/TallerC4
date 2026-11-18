@@ -21,13 +21,13 @@ Comprobar que una persona puede completar el flujo SRI → vehículo → ANT, en
 
 No explicar dónde hacer clic. Leer únicamente: “Necesitas revisar la información tributaria, vehicular y los puntos de una persona. Cuéntame en voz alta qué entiendes y qué harías”.
 
-## Tareas
+## Sesión corta — tres tareas
 
 1. Consultar un contribuyente usando correo y RUC.
-2. Consultar la placa `PEI7954` y explicar qué significa el conteo de pagos.
-3. Consultar puntos ANT con escenario de éxito e identificar la fuente.
-4. Cambiar a `Sin resultados` y explicar la diferencia frente a `HTTP 502`.
-5. Mostrar un resultado stale y decir si lo usaría como dato actual.
+2. Consultar una placa y explicar qué significa el conteo de pagos.
+3. Consultar puntos ANT e identificar la fuente y el estado del resultado.
+
+Las variantes `Sin resultados`, `Timeout` y `HTTP 502` son comprobaciones técnicas opcionales de resiliencia; no cuentan como tareas adicionales de la sesión humana corta.
 
 ## Criterios de éxito
 

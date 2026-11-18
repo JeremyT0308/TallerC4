@@ -15,9 +15,9 @@
 | --- | --- | --- | --- | --- |
 | Contribuyente SRI | | | | |
 | Vehículo SRI | | | | |
-| ANT éxito | | | | |
-| ANT sin resultados | | | | |
-| ANT stale/error | | | | |
+| ANT puntos y procedencia | | | | |
+
+Variantes técnicas opcionales (no forman parte de las tres tareas humanas): `Sin resultados`, `Timeout`, `HTTP 502`, fallback stale.
 
 ## Hallazgos
 

@@ -11,6 +11,8 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
       database: ${REDIS_DATABASE:0}
+      ssl:
+        enabled: ${REDIS_SSL_ENABLED:false}
       connect-timeout: ${REDIS_CONNECT_TIMEOUT_MS:1000}ms
       timeout: ${REDIS_READ_TIMEOUT_MS:1000}ms
 sri:

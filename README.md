@@ -66,6 +66,10 @@ Para probar fallas ANT sin depender del portal externo, deja `ANT_PROVIDER=simul
 | `ANT_SIMULATION_SCENARIO` | `success` | Caso determinista del simulador |
 | `ANT_REAL_URL` | Portal ANT público | URL del adapter real |
 | `REDIS_ENABLED` | `false` | Activa cache Redis; memoria es el default |
+| `REDIS_HOST`, `REDIS_PORT`, `REDIS_DATABASE` | `localhost`, `6379`, `0` | Endpoint Redis |
+| `REDIS_PASSWORD` | vacío | Credencial local; nunca subirla al repositorio |
+| `REDIS_SSL_ENABLED` | `false` | `true` para Redis Cloud/TLS |
+| `REDIS_CONNECT_TIMEOUT_MS`, `REDIS_READ_TIMEOUT_MS` | `1000`, `1000` | Timeouts Redis |
 | `ANT_CACHE_FRESH_MINUTES` | `15` | Ventana fresca |
 | `ANT_CACHE_MAX_STALE_DAYS` | `7` | Antigüedad máxima de fallback |
 
@@ -77,5 +81,7 @@ El archivo `.env.example` contiene la configuración completa y no incluye secre
 - `GET /api/v1/vehicles/{plate}`
 - `GET /api/v1/ant/points?identification=...&scenario=...`
 
-El contrato detallado está en [`docs/contracts/openapi.yaml`](docs/contracts/openapi.yaml). El inventario C4, las decisiones, el protocolo de usabilidad y el checklist de evidencia están en `docs/architecture/`, `docs/usability/` y `docs/evidence/`.
+El contrato detallado está en [`docs/contracts/openapi.yaml`](docs/contracts/openapi.yaml). El inventario C4, las decisiones, el protocolo de usabilidad, la verificación Redis y el checklist de evidencia están en `docs/architecture/`, `docs/usability/` y `docs/evidence/`.
+
+La guía para conectar Redis Cloud sin exponer credenciales está en [`docs/evidence/redis-cloud-verification.md`](docs/evidence/redis-cloud-verification.md).
 
