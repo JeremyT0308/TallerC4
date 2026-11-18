@@ -54,4 +54,46 @@ class AntPointsServiceTest {
         assertTrue(badGatewayFallback.stale());
         assertEquals("ANT_SIMULATED", badGatewayFallback.source());
     }
+
+    @Test
+    void simulatedInvalidResponseRecoversFromLastValidCacheAsStale() {
+        SimulatedAntAdapter provider = new SimulatedAntAdapter("success");
+        InMemoryAntCache cache = new InMemoryAntCache();
+        AntPointsService service = new AntPointsService(Optional.of(provider), Optional.of(cache),
+                new AntCachePolicy(Duration.ofMinutes(15), Duration.ofDays(7)),
+                () -> Instant.parse("2026-11-17T20:00:00Z"));
+
+        service.query("0000000012", "success");
+        AntPointsResponse response = service.query("0000000012", "invalid-response");
+
+        assertEquals(30.0, response.points());
+        assertEquals("ANT_SIMULATED", response.source());
+        assertTrue(response.stale());
+        assertEquals(Instant.parse("2026-11-17T20:00:00Z"), response.retrievedAt());
+        assertEquals(Instant.parse("2026-11-17T20:00:00Z"), response.staleSince());
+    }
+
+    @Test
+    void timeoutWithoutCacheReturnsUnavailable() {
+        AntPointsService service = new AntPointsService(Optional.of(new SimulatedAntAdapter("timeout")),
+                Optional.of(new InMemoryAntCache()), new AntCachePolicy(Duration.ofMinutes(15), Duration.ofDays(7)),
+                () -> Instant.parse("2026-11-17T20:00:00Z"));
+
+        ServiceUnavailableException error = assertThrows(ServiceUnavailableException.class,
+                () -> service.query("0000000013", "timeout"));
+
+        assertTrue(error.getMessage().contains("no existe un resultado ANT utilizable"));
+    }
+
+    @Test
+    void invalidResponseWithoutCacheReturnsUnavailable() {
+        AntPointsService service = new AntPointsService(Optional.of(new SimulatedAntAdapter("invalid-response")),
+                Optional.of(new InMemoryAntCache()), new AntCachePolicy(Duration.ofMinutes(15), Duration.ofDays(7)),
+                () -> Instant.parse("2026-11-17T20:00:00Z"));
+
+        ServiceUnavailableException error = assertThrows(ServiceUnavailableException.class,
+                () -> service.query("0000000014", "invalid-response"));
+
+        assertTrue(error.getMessage().contains("no existe un resultado ANT utilizable"));
+    }
 }
