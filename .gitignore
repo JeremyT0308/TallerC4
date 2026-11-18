@@ -1,0 +1,21 @@
+# Java / Maven
+backend/target/
+*.class
+
+# Node / Vite
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Local configuration and private log
+.env
+.env.*
+!.env.example
+BITACORA_PRIVADA.md
+
+# Local developer tooling
+.idea/
+.vscode/
+.superpowers/
+coverage/
+
