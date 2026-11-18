@@ -43,8 +43,10 @@ autenticación, microservicios ni un portal transaccional del SRI.
 
 ## Requisitos y decisiones
 
-- RUC: 13 dígitos; se valida el dígito verificador ecuatoriano para evitar
-  llamadas obvias inválidas.
+- RUC: 13 dígitos, provincia válida y estructura no nula. No se impone un
+  checksum universal: el SRI documenta que los RUC emitidos para sociedades
+  privadas, públicas y personas naturales extranjeras no tienen un algoritmo
+  general vigente; la existencia real se valida con el endpoint SRI.
 - Placa: se normaliza a mayúsculas y se aceptan formatos alfanuméricos sin
   espacios ni guiones.
 - El correo se recopila como dato de contacto de la consulta; no se persiste.

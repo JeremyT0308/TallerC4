@@ -1,0 +1,119 @@
+openapi: 3.0.3
+info:
+  title: TallerC4 API
+  version: 0.1.0
+  description: API interna para consultas SRI y ANT con procedencia explícita.
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/v1/taxpayers/{ruc}:
+    get:
+      summary: Consulta existencia y datos de un contribuyente en SRI
+      parameters:
+        - $ref: '#/components/parameters/Ruc'
+        - name: email
+          in: query
+          required: true
+          schema: { type: string, format: email }
+      responses:
+        '200':
+          description: Contribuyente encontrado
+          content: { application/json: { schema: { $ref: '#/components/schemas/TaxpayerDetails' } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /api/v1/vehicles/{plate}:
+    get:
+      summary: Consulta pagos y datos disponibles de vehículo en SRI
+      parameters:
+        - $ref: '#/components/parameters/Plate'
+      responses:
+        '200':
+          description: Vehículo encontrado
+          content: { application/json: { schema: { $ref: '#/components/schemas/VehicleDetails' } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /api/v1/ant/points:
+    get:
+      summary: Consulta puntos ANT detrás del adaptador configurado
+      parameters:
+        - name: identification
+          in: query
+          required: true
+          schema: { type: string, pattern: '^\\d{10}$' }
+        - name: scenario
+          in: query
+          required: false
+          description: Solo desarrollo; selecciona un caso determinista del simulador.
+          schema: { type: string, enum: [success, no-results, bad-gateway, timeout, invalid-response] }
+      responses:
+        '200':
+          description: Resultado vivo, simulado o stale elegible
+          content: { application/json: { schema: { $ref: '#/components/schemas/AntPoints' } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+components:
+  parameters:
+    Ruc:
+      name: ruc
+      in: path
+      required: true
+      schema: { type: string, pattern: '^\\d{13}$' }
+    Plate:
+      name: plate
+      in: path
+      required: true
+      schema: { type: string, pattern: '^[A-Za-z0-9 -]{3,8}$' }
+  schemas:
+    TaxpayerDetails:
+      type: object
+      required: [ruc, legalName, status, taxpayerType]
+      properties:
+        ruc: { type: string }
+        legalName: { type: string }
+        status: { type: string }
+        taxpayerType: { type: string }
+        regime: { type: string, nullable: true }
+        mainEconomicActivity: { type: string, nullable: true }
+        category: { type: string, nullable: true }
+    VehicleDetails:
+      type: object
+      required: [plate, paymentCount]
+      properties:
+        plate: { type: string }
+        brand: { type: string, nullable: true }
+        model: { type: string, nullable: true }
+        modelYear: { type: integer, nullable: true }
+        paymentCount: { type: integer, minimum: 0 }
+    AntPoints:
+      type: object
+      required: [identification, points, source, simulated, stale, retrievedAt]
+      properties:
+        identification: { type: string }
+        points: { type: number, format: double, nullable: true }
+        source: { type: string, enum: [ANT, ANT_SIMULATED, ANT_CACHE] }
+        simulated: { type: boolean }
+        stale: { type: boolean }
+        retrievedAt: { type: string, format: date-time }
+        staleSince: { type: string, format: date-time, nullable: true }
+        note: { type: string, nullable: true }
+    ApiError:
+      type: object
+      required: [code, message, status, timestamp, path]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        status: { type: integer }
+        timestamp: { type: string, format: date-time }
+        path: { type: string }
+  responses:
+    ValidationError:
+      description: Entrada inválida
+      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+    NotFound:
+      description: Registro no encontrado
+      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+    Unavailable:
+      description: Proveedor no disponible y sin fallback elegible
+      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }

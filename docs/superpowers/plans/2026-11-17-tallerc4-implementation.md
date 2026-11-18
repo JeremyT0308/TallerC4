@@ -21,7 +21,7 @@
 
 ## Review Focus
 
-- RUC checksum-valid but non-existing: return a clear not-found state without attempting detail mapping.
+- Structurally valid but non-existing RUC: return a clear not-found state without attempting detail mapping.
 - SRI returns malformed JSON or an empty list: surface provider-unavailable/empty distinctly, never fabricate a taxpayer.
 - ANT real adapter returns 401/HTML: classify as unavailable and preserve a valid cached result if eligible.
 - Redis is down during an ANT success: return live result and keep the failure observable without failing the whole request.
