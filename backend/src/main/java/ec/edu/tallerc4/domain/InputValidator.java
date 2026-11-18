@@ -31,6 +31,13 @@ public final class InputValidator {
         return normalized;
     }
 
+    public static String requireIdentification(String value) {
+        if (value == null || !value.matches("\\d{10}")) {
+            throw new IllegalArgumentException("La identificación ANT debe tener 10 dígitos.");
+        }
+        return value;
+    }
+
     public static boolean isValidRuc(String value) {
         if (value == null || !value.matches("\\d{13}") || !validProvince(value.substring(0, 2))
                 || value.chars().allMatch(ch -> ch == '0')) {

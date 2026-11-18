@@ -15,4 +15,8 @@ sri:
   base-url: ${SRI_BASE_URL:https://srienlinea.sri.gob.ec}
   connect-timeout: ${HTTP_CONNECT_TIMEOUT_MS:3000}ms
   read-timeout: ${HTTP_READ_TIMEOUT_MS:8000}ms
+ant:
+  provider: ${ANT_PROVIDER:simulated}
+  simulation-scenario: ${ANT_SIMULATION_SCENARIO:success}
+  real-url: ${ANT_REAL_URL:https://consultaweb.ant.gob.ec/PortalWEB/paginas/clientes/clp_grid_citaciones.jsp}
 
