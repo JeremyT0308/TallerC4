@@ -19,4 +19,8 @@ ant:
   provider: ${ANT_PROVIDER:simulated}
   simulation-scenario: ${ANT_SIMULATION_SCENARIO:success}
   real-url: ${ANT_REAL_URL:https://consultaweb.ant.gob.ec/PortalWEB/paginas/clientes/clp_grid_citaciones.jsp}
+redis:
+  enabled: ${REDIS_ENABLED:false}
+  fresh-minutes: ${ANT_CACHE_FRESH_MINUTES:15}
+  max-stale-days: ${ANT_CACHE_MAX_STALE_DAYS:7}
 
