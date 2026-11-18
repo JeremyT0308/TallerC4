@@ -33,12 +33,14 @@ const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
 try {
   await page.goto(baseUrl, { waitUntil: 'networkidle' });
   await expect(page.getByRole('heading', { name: /TallerC4/i }).first()).toBeVisible();
-  await capture(page, '01-initial-responsive-flow.png');
+  await capture(page, 'ux-after-desktop.png');
   await page.setViewportSize({ width: 390, height: 844 });
   await page.reload({ waitUntil: 'networkidle' });
-  await capture(page, '01b-mobile-responsive-flow.png');
+  await capture(page, 'ux-after-mobile.png');
   await page.setViewportSize({ width: 1365, height: 900 });
   await page.reload({ waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: /consultar contribuyente/i }).hover();
+  await capture(page, 'ux-hover.png');
 
   await check('Tarea 1 — consulta RUC en SRI', async () => {
     await page.getByLabel(/correo electrónico/i).fill('demo@example.com');
@@ -58,23 +60,34 @@ try {
   await page.reload({ waitUntil: 'networkidle' });
   const antId = page.getByLabel(/identificación para ANT/i);
   const antScenario = page.getByLabel(/escenario de demostración/i);
-  const antSubmit = page.getByRole('button', { name: /consultar puntos ant/i });
-  await antId.fill('0000000011');
+  const antSubmit = page.locator('#ant button[type="submit"]');
+  await antId.fill('0000000099');
 
   await check('Tarea 3 — consulta ANT simulada exitosa', async () => {
     await antScenario.selectOption('success');
+    await page.route(/\/api\/v1\/ant\/points/, async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 900));
+      await route.continue();
+    });
     await antSubmit.click();
+    await expect(antSubmit).toHaveAttribute('aria-busy', 'true');
+    await expect(page.getByText(/consultando datos/i)).toBeVisible();
+    await capture(page, 'ux-loading.png');
     await expect(page.getByRole('article', { name: 'Resultado ANT' })).toContainText('30 puntos');
+    await page.unroute(/\/api\/v1\/ant\/points/);
     await expect(page.getByText('Simulado', { exact: true })).toBeVisible();
-    await capture(page, '02-ant-simulated-success.png');
+    await expect(page.getByText('Consulta ANT lista', { exact: true })).toBeVisible();
+    await capture(page, 'ux-toast.png');
+    await page.getByText('Ver detalles', { exact: true }).click();
+    await expect(page.getByText('Ocultar detalles', { exact: true })).toBeVisible();
+    await capture(page, 'ux-results.png');
   });
 
   await check('ANT timeout — recuperación stale', async () => {
     await antScenario.selectOption('timeout');
     await antSubmit.click();
     await expect(page.getByText('Datos stale', { exact: true })).toBeVisible();
-    await expect(page.getByRole('status')).toContainText('ANT no respondió');
-    await capture(page, '03-ant-stale-after-timeout.png');
+    await expect(page.locator('.stale-warning')).toContainText('ANT no respondió');
   });
 
   await check('ANT HTTP 502 — conserva último resultado válido', async () => {
@@ -82,16 +95,15 @@ try {
     await antSubmit.click();
     await expect(page.getByText('Datos stale', { exact: true })).toBeVisible();
     await expect(page.getByRole('article', { name: 'Resultado ANT' })).toContainText('30 puntos');
+    await page.getByText('Ver detalles', { exact: true }).click();
     await expect(page.getByText(/Resultado recuperado de cache ANT/i)).toBeVisible();
-    await capture(page, '04-ant-recovery-after-502.png');
   });
 
   await check('ANT timeout sin cache — servicio no disponible', async () => {
     await antId.fill('0000000022');
     await antScenario.selectOption('timeout');
     await antSubmit.click();
-    await expect(page.getByRole('alert')).toContainText('Servicio no disponible');
-    await capture(page, '05-ant-unavailable-without-cache.png');
+    await expect(page.locator('.message-error')).toContainText('Servicio no disponible');
   });
 } finally {
   const report = [
@@ -109,12 +121,19 @@ try {
     '',
     '## Evidencia visual',
     '',
-    '- `screenshots/01-initial-responsive-flow.png` — flujo inicial.',
-    '- `screenshots/01b-mobile-responsive-flow.png` — flujo inicial en viewport móvil.',
-    '- `screenshots/02-ant-simulated-success.png` — resultado ANT simulado con procedencia visible.',
-    '- `screenshots/03-ant-stale-after-timeout.png` — timeout recuperado desde cache con advertencia stale.',
-    '- `screenshots/04-ant-recovery-after-502.png` — HTTP 502 recuperado desde el último resultado válido.',
-    '- `screenshots/05-ant-unavailable-without-cache.png` — timeout sin cache elegible y error 503 visible.',
+    '- `screenshots/01-initial-responsive-flow.png` — flujo inicial conservado de la evidencia previa.',
+    '- `screenshots/01b-mobile-responsive-flow.png` — flujo móvil conservado de la evidencia previa.',
+    '- `screenshots/ux-before.png` — diseño original conservado antes del cambio.',
+    '- `screenshots/ux-after-desktop.png` — diseño renovado en viewport desktop.',
+    '- `screenshots/ux-after-mobile.png` — diseño renovado en viewport móvil.',
+    '- `screenshots/ux-hover.png` — hover real sobre el CTA de contribuyente.',
+    '- `screenshots/ux-toast.png` — toast real de éxito ANT.',
+    '- `screenshots/ux-loading.png` — loading real con respuesta demorada.',
+    '- `screenshots/ux-results.png` — resultado ANT expandido con procedencia.',
+    '- `screenshots/02-ant-simulated-success.png` — resultado ANT simulado conservado de la evidencia previa.',
+    '- `screenshots/03-ant-stale-after-timeout.png` — timeout stale conservado de la evidencia previa.',
+    '- `screenshots/04-ant-recovery-after-502.png` — recuperación 502 conservada de la evidencia previa.',
+    '- `screenshots/05-ant-unavailable-without-cache.png` — error sin cache conservado de la evidencia previa.',
     '',
     '## Resultados humanos pendientes',
     '',

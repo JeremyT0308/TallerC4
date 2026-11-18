@@ -12,6 +12,18 @@ La evidencia debe mostrar la interfaz o la salida real de una ejecución. No se 
 - [ ] Resultado stale con `Datos stale`, `Consultado`, `Datos stale desde` y advertencia.
 - [ ] Vista móvil o ancho reducido donde no se corte ningún formulario.
 
+## Evidencia UX/UI solicitada
+
+- [x] `screenshots/ux-before.png` — captura original preservada antes del cambio.
+- [x] `screenshots/ux-after-desktop.png` — diseño renovado desktop.
+- [x] `screenshots/ux-after-mobile.png` — diseño renovado móvil.
+- [x] `screenshots/ux-hover.png` — microinteracción hover real.
+- [x] `screenshots/ux-toast.png` — notificación real de éxito/error.
+- [x] `screenshots/ux-loading.png` — indicador de carga con respuesta demorada.
+- [x] `screenshots/ux-results.png` — resultado expandido con procedencia y timestamp.
+
+Estas capturas fueron tomadas con Playwright/Edge contra la aplicación local. La identificación ANT visible es sintética y no representa una persona.
+
 ## Datos reproducibles
 
 - RUC de prueba: `1716537341001` para el flujo simulado de frontend.

@@ -12,7 +12,7 @@ Entrega funcional del flujo SRI → vehículo → ANT. Los contratos SRI usados 
 - `frontend/`: React + Vite + TypeScript.
 - `docs/contracts/`: OpenAPI y contratos de proveedores.
 - `docs/architecture/`: inventario C4 textual y decisiones.
-- `docs/usability/`: protocolo de prueba.
+- `docs/usability/`: protocolo de prueba, plantilla humana e informe UX/UI.
 - `docs/evidence/`: checklist de capturas reales.
 
 ## Requisitos
@@ -57,6 +57,8 @@ npm run build
 
 Para probar fallas ANT sin depender del portal externo, deja `ANT_PROVIDER=simulated` y cambia `ANT_SIMULATION_SCENARIO` entre `success`, `no-results`, `bad-gateway`, `timeout` e `invalid-response`. Para probar el adapter real, usa `ANT_PROVIDER=real` y una URL ANT autorizada/configurada; el frontend no cambia.
 
+La interfaz mantiene React + Vite y los contratos existentes, pero ahora separa las tarjetas de consulta, añade navegación de progreso, loading accesible, toasts, resultados expandibles, responsive móvil y animaciones CSS respetando `prefers-reduced-motion`. El análisis antes/después está en [`docs/usability/ux-improvement-report.md`](docs/usability/ux-improvement-report.md).
+
 ## Configuración principal
 
 | Variable | Default | Uso |
@@ -82,6 +84,8 @@ El archivo `.env.example` contiene la configuración completa y no incluye secre
 - `GET /api/v1/ant/points?identification=...&scenario=...`
 
 El contrato detallado está en [`docs/contracts/openapi.yaml`](docs/contracts/openapi.yaml). El inventario C4, las decisiones, el protocolo de usabilidad, la verificación Redis y el checklist de evidencia están en `docs/architecture/`, `docs/usability/` y `docs/evidence/`.
+
+Con backend y frontend locales activos, la verificación de navegador se ejecuta con `npm run e2e:usability`. Genera el reporte automatizado y las capturas reales bajo `docs/evidence/screenshots/`. Un PASS automatizado no equivale a resultados de participantes humanos.
 
 La guía para conectar Redis Cloud sin exponer credenciales está en [`docs/evidence/redis-cloud-verification.md`](docs/evidence/redis-cloud-verification.md).
 

@@ -1,6 +1,6 @@
 # Reporte de verificación automatizada de usabilidad
 
-- Generado: 2026-11-18T03:24:54.509Z
+- Generado: 2026-11-18T04:07:14.942Z
 - URL: http://127.0.0.1:5173/
 - Condición: backend local con `ANT_PROVIDER=simulated`, cache en memoria y sin credenciales Redis.
 - Datos de formulario: correo sintético; RUC corporativo y placa de prueba usados únicamente contra los endpoints SRI del entorno local.
@@ -17,12 +17,19 @@
 
 ## Evidencia visual
 
-- `screenshots/01-initial-responsive-flow.png` — flujo inicial.
-- `screenshots/01b-mobile-responsive-flow.png` — flujo inicial en viewport móvil.
-- `screenshots/02-ant-simulated-success.png` — resultado ANT simulado con procedencia visible.
-- `screenshots/03-ant-stale-after-timeout.png` — timeout recuperado desde cache con advertencia stale.
-- `screenshots/04-ant-recovery-after-502.png` — HTTP 502 recuperado desde el último resultado válido.
-- `screenshots/05-ant-unavailable-without-cache.png` — timeout sin cache elegible y error 503 visible.
+- `screenshots/01-initial-responsive-flow.png` — flujo inicial conservado de la evidencia previa.
+- `screenshots/01b-mobile-responsive-flow.png` — flujo móvil conservado de la evidencia previa.
+- `screenshots/ux-before.png` — diseño original conservado antes del cambio.
+- `screenshots/ux-after-desktop.png` — diseño renovado en viewport desktop.
+- `screenshots/ux-after-mobile.png` — diseño renovado en viewport móvil.
+- `screenshots/ux-hover.png` — hover real sobre el CTA de contribuyente.
+- `screenshots/ux-toast.png` — toast real de éxito ANT.
+- `screenshots/ux-loading.png` — loading real con respuesta demorada.
+- `screenshots/ux-results.png` — resultado ANT expandido con procedencia.
+- `screenshots/02-ant-simulated-success.png` — resultado ANT simulado conservado de la evidencia previa.
+- `screenshots/03-ant-stale-after-timeout.png` — timeout stale conservado de la evidencia previa.
+- `screenshots/04-ant-recovery-after-502.png` — recuperación 502 conservada de la evidencia previa.
+- `screenshots/05-ant-unavailable-without-cache.png` — error sin cache conservado de la evidencia previa.
 
 ## Resultados humanos pendientes
 
