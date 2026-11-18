@@ -11,4 +11,8 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
       database: ${REDIS_DATABASE:0}
+sri:
+  base-url: ${SRI_BASE_URL:https://srienlinea.sri.gob.ec}
+  connect-timeout: ${HTTP_CONNECT_TIMEOUT_MS:3000}ms
+  read-timeout: ${HTTP_READ_TIMEOUT_MS:8000}ms
 
