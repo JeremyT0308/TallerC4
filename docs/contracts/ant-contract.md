@@ -21,8 +21,10 @@ como una persona para la consulta ANT.
 ```
 
 `RealAntAdapter` usa la URL configurable del portal oficial de consulta de
-citaciones, espera una respuesta HTML con identificación/licencia/puntos y
-rechaza 401, HTML inesperado o ausencia de puntos como indisponibilidad. La
+citaciones y busca un campo HTML de puntos verificable. También reconoce el
+tipo de licencia cuando aparece en la respuesta del proveedor, aunque el
+contrato estable de la aplicación solo expone los puntos y su procedencia.
+Rechaza 401, HTML inesperado o ausencia de puntos como indisponibilidad. La
 verificación automatizada del 17 de noviembre de 2026 recibió 401, por lo que
 no se afirma aquí que exista un API REST público verificable.
 

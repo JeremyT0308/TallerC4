@@ -4,7 +4,7 @@ Aplicación web académica para consultar información tributaria y vehicular de
 
 ## Estado
 
-El repositorio se construye por fases. Los contratos SRI usados por el backend fueron verificados contra los servicios REST públicos observados el 17 de noviembre de 2026. ANT se mantiene detrás de un puerto porque el portal público de consulta de citaciones/puntos devolvió `401 Unauthorized` durante la verificación automatizada; el modo simulado es explícito y visible.
+Entrega funcional del flujo SRI → vehículo → ANT. Los contratos SRI usados por el backend fueron verificados contra los servicios REST públicos observados el 17 de noviembre de 2026. ANT se mantiene detrás de un puerto porque el portal público de consulta de citaciones/puntos devolvió `401 Unauthorized` durante la verificación automatizada; el modo simulado es explícito y visible. La interfaz y los contratos no inventan datos cuando un proveedor no está disponible.
 
 ## Estructura
 
@@ -47,5 +47,27 @@ cd ..\frontend; npm test -- --run
 npm run build
 ```
 
-La documentación final indicará qué verificaciones externas fueron posibles y cuáles requieren credenciales o revisión manual.
+Para probar fallas ANT sin depender del portal externo, deja `ANT_PROVIDER=simulated` y cambia `ANT_SIMULATION_SCENARIO` entre `success`, `no-results`, `bad-gateway`, `timeout` e `invalid-response`. Para probar el adapter real, usa `ANT_PROVIDER=real` y una URL ANT autorizada/configurada; el frontend no cambia.
+
+## Configuración principal
+
+| Variable | Default | Uso |
+| --- | --- | --- |
+| `SRI_BASE_URL` | `https://srienlinea.sri.gob.ec` | Base de los adapters SRI |
+| `ANT_PROVIDER` | `simulated` | `simulated` o `real` |
+| `ANT_SIMULATION_SCENARIO` | `success` | Caso determinista del simulador |
+| `ANT_REAL_URL` | Portal ANT público | URL del adapter real |
+| `REDIS_ENABLED` | `false` | Activa cache Redis; memoria es el default |
+| `ANT_CACHE_FRESH_MINUTES` | `15` | Ventana fresca |
+| `ANT_CACHE_MAX_STALE_DAYS` | `7` | Antigüedad máxima de fallback |
+
+El archivo `.env.example` contiene la configuración completa y no incluye secretos.
+
+## Endpoints
+
+- `GET /api/v1/taxpayers/{ruc}?email=...`
+- `GET /api/v1/vehicles/{plate}`
+- `GET /api/v1/ant/points?identification=...&scenario=...`
+
+El contrato detallado está en [`docs/contracts/openapi.yaml`](docs/contracts/openapi.yaml). El inventario C4, las decisiones, el protocolo de usabilidad y el checklist de evidencia están en `docs/architecture/`, `docs/usability/` y `docs/evidence/`.
 
