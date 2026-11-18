@@ -24,8 +24,16 @@ Entrega funcional del flujo SRI → vehículo → ANT. Los contratos SRI usados 
 ## Inicio local
 
 ```powershell
-Copy-Item .env.example .env
 cd backend
+mvn spring-boot:run
+```
+
+El backend inicia por defecto con ANT simulado y cache en memoria. `.env.example` es una plantilla de referencia; Spring Boot no carga `.env` automáticamente. Para cambiar valores en PowerShell, define las variables antes de iniciar:
+
+```powershell
+$env:ANT_PROVIDER = "simulated"
+$env:ANT_SIMULATION_SCENARIO = "success"
+$env:REDIS_ENABLED = "false"
 mvn spring-boot:run
 ```
 
