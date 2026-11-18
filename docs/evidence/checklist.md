@@ -5,12 +5,12 @@ La evidencia debe mostrar la interfaz o la salida real de una ejecución. No se 
 ## Capturas recomendadas
 
 - [ ] Pantalla inicial responsive con los tres pasos y campos etiquetados.
-- [ ] Resultado SRI de contribuyente con `RUC`, estado, tipo, régimen y actividad.
-- [ ] Resultado SRI vehicular para `PEI7954`, mostrando el conteo de pagos y los campos ausentes como no disponibles.
+- [x] Resultado SRI de contribuyente con `RUC`, estado, tipo, régimen y actividad — `screenshots/api-sri-taxpayer.png`.
+- [x] Resultado SRI vehicular para `PEI7954`, mostrando el conteo de pagos y los campos ausentes como no disponibles — `screenshots/api-sri-vehicle.png`.
 - [ ] Resultado ANT de escenario `Éxito` con badge `Simulado`, fuente `ANT_SIMULATED` y nota visible.
 - [ ] Resultado ANT `Sin resultados` o error `HTTP 502`, con mensaje accionable.
-- [ ] Resultado stale con `Datos stale`, `Consultado`, `Datos stale desde` y advertencia.
-- [ ] Vista móvil o ancho reducido donde no se corte ningún formulario.
+- [x] Resultado stale con `Datos stale`, `Consultado`, `Datos stale desde` y advertencia — `screenshots/03-ant-stale-after-timeout.png` y `screenshots/04-ant-recovery-after-502.png`.
+- [x] Vista móvil o ancho reducido donde no se corte ningún formulario — `screenshots/ux-after-mobile.png`.
 
 ## Evidencia UX/UI solicitada
 

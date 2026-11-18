@@ -87,5 +87,5 @@ El contrato detallado está en [`docs/contracts/openapi.yaml`](docs/contracts/op
 
 Con backend y frontend locales activos, la verificación de navegador se ejecuta con `npm run e2e:usability`. Genera el reporte automatizado y las capturas reales bajo `docs/evidence/screenshots/`. Un PASS automatizado no equivale a resultados de participantes humanos.
 
-La guía para conectar Redis Cloud sin exponer credenciales está en [`docs/evidence/redis-cloud-verification.md`](docs/evidence/redis-cloud-verification.md).
+La guía para conectar Redis Cloud sin exponer credenciales está en [`docs/evidence/redis-cloud-verification.md`](docs/evidence/redis-cloud-verification.md). La matriz consolidada de criterios, pruebas, códigos HTTP, capturas y limitaciones está en [`docs/evidence/rubric-verification.md`](docs/evidence/rubric-verification.md).
 

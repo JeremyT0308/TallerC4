@@ -47,6 +47,7 @@ try {
     await page.getByLabel(/^RUC/i).fill('1790016919001');
     await page.getByRole('button', { name: /consultar contribuyente/i }).click();
     await expect(page.getByRole('article', { name: 'Resultado del contribuyente' })).toContainText('ACTIVO');
+    await capture(page, 'api-sri-taxpayer.png');
   });
 
   await page.reload({ waitUntil: 'networkidle' });
@@ -55,6 +56,7 @@ try {
     await page.getByLabel(/placa/i).fill('PEI7954');
     await page.getByRole('button', { name: /consultar vehículo/i }).click();
     await expect(page.getByRole('article', { name: 'Resultado del vehículo' })).toContainText('Pagos reportados');
+    await capture(page, 'api-sri-vehicle.png');
   });
 
   await page.reload({ waitUntil: 'networkidle' });
@@ -130,6 +132,8 @@ try {
     '- `screenshots/ux-toast.png` — toast real de éxito ANT.',
     '- `screenshots/ux-loading.png` — loading real con respuesta demorada.',
     '- `screenshots/ux-results.png` — resultado ANT expandido con procedencia.',
+    '- `screenshots/api-sri-taxpayer.png` — resultado SRI de contribuyente en flujo E2E.',
+    '- `screenshots/api-sri-vehicle.png` — resultado SRI vehicular en flujo E2E.',
     '- `screenshots/02-ant-simulated-success.png` — resultado ANT simulado conservado de la evidencia previa.',
     '- `screenshots/03-ant-stale-after-timeout.png` — timeout stale conservado de la evidencia previa.',
     '- `screenshots/04-ant-recovery-after-502.png` — recuperación 502 conservada de la evidencia previa.',

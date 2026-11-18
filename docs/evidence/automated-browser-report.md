@@ -1,6 +1,6 @@
 # Reporte de verificación automatizada de usabilidad
 
-- Generado: 2026-11-18T04:07:14.942Z
+- Generado: 2026-11-18T04:41:51.205Z
 - URL: http://127.0.0.1:5173/
 - Condición: backend local con `ANT_PROVIDER=simulated`, cache en memoria y sin credenciales Redis.
 - Datos de formulario: correo sintético; RUC corporativo y placa de prueba usados únicamente contra los endpoints SRI del entorno local.
@@ -26,6 +26,8 @@
 - `screenshots/ux-toast.png` — toast real de éxito ANT.
 - `screenshots/ux-loading.png` — loading real con respuesta demorada.
 - `screenshots/ux-results.png` — resultado ANT expandido con procedencia.
+- `screenshots/api-sri-taxpayer.png` — resultado SRI de contribuyente en flujo E2E.
+- `screenshots/api-sri-vehicle.png` — resultado SRI vehicular en flujo E2E.
 - `screenshots/02-ant-simulated-success.png` — resultado ANT simulado conservado de la evidencia previa.
 - `screenshots/03-ant-stale-after-timeout.png` — timeout stale conservado de la evidencia previa.
 - `screenshots/04-ant-recovery-after-502.png` — recuperación 502 conservada de la evidencia previa.
