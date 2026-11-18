@@ -1,6 +1,6 @@
 # Reporte de verificación automatizada de usabilidad
 
-- Generado: 2026-11-18T04:41:51.205Z
+- Generado: 2026-11-18T04:46:30.315Z
 - URL: http://127.0.0.1:5173/
 - Condición: backend local con `ANT_PROVIDER=simulated`, cache en memoria y sin credenciales Redis.
 - Datos de formulario: correo sintético; RUC corporativo y placa de prueba usados únicamente contra los endpoints SRI del entorno local.

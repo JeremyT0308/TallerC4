@@ -1,6 +1,6 @@
 # Verificación consolidada de rúbrica
 
-- Generado: `2026-11-17T23:42:37-05:00`.
+- Generado: `2026-11-17T23:46:30-05:00`.
 - Rama verificada: `main`.
 - Condición de ejecución: backend y frontend locales; `ANT_PROVIDER=simulated`; `REDIS_ENABLED=false`; no se imprimieron credenciales.
 - No se modificaron los diagramas IcePanel ni la arquitectura C1/C2/C3.

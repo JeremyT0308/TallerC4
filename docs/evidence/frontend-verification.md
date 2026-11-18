@@ -1,6 +1,6 @@
 # Verificación frontend y navegador
 
-- Generado: `2026-11-17T23:41:51-05:00` (ejecución E2E; reporte completo en `automated-browser-report.md`).
+- Generado: `2026-11-17T23:46:30-05:00` (ejecución E2E; reporte completo en `automated-browser-report.md`).
 - URL: `http://127.0.0.1:5173/`.
 - Backend: Spring Boot local en `http://127.0.0.1:8080`.
 - Condición: `ANT_PROVIDER=simulated`, escenarios deterministas, `REDIS_ENABLED=false`, cache en memoria.
