@@ -43,6 +43,18 @@ class AntPointsCacheTest {
     }
 
     @Test
+    void marksFreshCacheAsStaleWhenItIsUsedAfterProviderFailure() {
+        RecordingProvider provider = new RecordingProvider(new ServiceUnavailableException("502"));
+        RecordingCache cache = new RecordingCache(new CachedAntPoints("0912576287", 30.0, "ANT", false,
+                Instant.parse("2026-11-17T19:55:00Z"), "B", null));
+        AntPointsResponse response = new AntPointsService(Optional.of(provider), Optional.of(cache),
+                new AntCachePolicy(Duration.ofMinutes(15), Duration.ofDays(7)), () -> NOW).query("0912576287");
+
+        assertTrue(response.stale());
+        assertEquals(NOW, response.staleSince());
+    }
+
+    @Test
     void rejectsExpiredCachedResultWithStructuredUnavailableException() {
         RecordingProvider provider = new RecordingProvider(new ServiceUnavailableException("502"));
         RecordingCache cache = new RecordingCache(new CachedAntPoints("0912576287", 30.0, "ANT", false,

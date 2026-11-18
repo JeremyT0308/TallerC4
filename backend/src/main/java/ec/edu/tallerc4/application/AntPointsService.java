@@ -49,9 +49,11 @@ public class AntPointsService {
             Optional<CachedAntPoints> cached = findCache(normalized);
             if (cached.isPresent() && cachePolicy.eligible(cached.get(), clock.get())) {
                 CachedAntPoints value = cached.get();
-                boolean stale = cachePolicy.stale(value, clock.get());
+                Instant fallbackAt = clock.get();
+                boolean stale = true;
+                Instant staleSince = cachePolicy.stale(value, fallbackAt) ? cachePolicy.staleSince(value) : fallbackAt;
                 return new AntPointsResponse(value.identification(), value.points(), value.source(), value.simulated(), stale,
-                        value.retrievedAt(), stale ? cachePolicy.staleSince(value) : null,
+                        value.retrievedAt(), staleSince,
                         "Resultado recuperado de cache ANT; la consulta en vivo falló.");
             }
             throw new ServiceUnavailableException("ANT no está disponible y no existe un resultado ANT utilizable.", providerFailure);
