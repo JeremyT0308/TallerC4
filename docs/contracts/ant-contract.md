@@ -24,9 +24,10 @@ como una persona para la consulta ANT.
 citaciones y busca un campo HTML de puntos verificable. También reconoce el
 tipo de licencia cuando aparece en la respuesta del proveedor, aunque el
 contrato estable de la aplicación solo expone los puntos y su procedencia.
-Rechaza 401, HTML inesperado o ausencia de puntos como indisponibilidad. La
-verificación automatizada del 17 de noviembre de 2026 recibió 401, por lo que
-no se afirma aquí que exista un API REST público verificable.
+Rechaza 401, HTML inesperado o ausencia de puntos como indisponibilidad. Las
+verificaciones automatizadas del 17 de noviembre de 2026 recibieron 401 y la
+reconsulta más reciente recibió 502, por lo que no se afirma aquí que exista
+un API REST público verificable.
 
 `SimulatedAntAdapter` cumple el mismo contrato y ofrece casos deterministas:
 `success`, `no-results`, `bad-gateway`, `timeout` e `invalid-response`. Todo

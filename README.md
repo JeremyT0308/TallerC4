@@ -4,7 +4,7 @@ Aplicación web académica para consultar información tributaria y vehicular de
 
 ## Estado
 
-Entrega funcional del flujo SRI → vehículo → ANT. Los contratos SRI usados por el backend fueron verificados contra los servicios REST públicos observados el 17 de noviembre de 2026. ANT se mantiene detrás de un puerto porque el portal público de consulta de citaciones/puntos devolvió `401 Unauthorized` durante la verificación automatizada; el modo simulado es explícito y visible. La interfaz y los contratos no inventan datos cuando un proveedor no está disponible.
+Entrega funcional del flujo SRI → vehículo → ANT. Los contratos SRI usados por el backend fueron verificados contra los servicios REST públicos observados el 17 de noviembre de 2026. ANT se mantiene detrás de un puerto porque las verificaciones automatizadas del portal público de consulta de citaciones/puntos devolvieron respuestas no utilizables (`401 Unauthorized` y, en la reconsulta más reciente, `502 Bad Gateway`); el modo simulado es explícito y visible. La interfaz y los contratos no inventan datos cuando un proveedor no está disponible.
 
 ## Estructura
 
