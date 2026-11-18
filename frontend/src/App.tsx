@@ -1,8 +1,14 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { ApiRequestError, getAntPoints, getTaxpayer, getVehicle } from './api/client';
 import type { AntPointsResponse, TaxpayerDetails, VehicleDetails } from './api/types';
+import { AntQueryCard } from './components/AntQueryCard';
+import { Icon } from './components/Icons';
+import { ProgressNav, type ProgressStepId, type ProgressStatus } from './components/ProgressNav';
+import { TaxpayerQueryCard } from './components/TaxpayerQueryCard';
+import { ToastViewport, type Toast, type ToastKind } from './components/ToastViewport';
+import type { QueryState } from './components/types';
+import { VehicleQueryCard } from './components/VehicleQueryCard';
 
-type QueryState<T> = { data: T | null; loading: boolean; error: string | null };
 const emptyState = <T,>(): QueryState<T> => ({ data: null, loading: false, error: null });
 
 function readableError(error: unknown) {
@@ -12,19 +18,6 @@ function readableError(error: unknown) {
     return error.message;
   }
   return 'Ocurrió un error inesperado. Intenta nuevamente.';
-}
-
-function formatDate(value?: string | null) {
-  if (!value) return 'No disponible';
-  return new Intl.DateTimeFormat('es-EC', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
-}
-
-function StatusBadge({ children, tone = 'neutral' }: { children: React.ReactNode; tone?: 'neutral' | 'success' | 'warning' | 'danger' }) {
-  return <span className={`badge badge-${tone}`}>{children}</span>;
-}
-
-function ErrorMessage({ children }: { children: string | null }) {
-  return children ? <p className="message message-error" role="alert">{children}</p> : null;
 }
 
 export default function App() {
@@ -38,8 +31,27 @@ export default function App() {
   const [taxpayer, setTaxpayer] = useState<QueryState<TaxpayerDetails>>(emptyState());
   const [vehicle, setVehicle] = useState<QueryState<VehicleDetails>>(emptyState());
   const [ant, setAnt] = useState<QueryState<AntPointsResponse>>(emptyState());
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const toastSequence = useRef(0);
 
   const normalizedPlate = useMemo(() => plate.trim().replace(/[\s-]/g, '').toUpperCase(), [plate]);
+
+  function pushToast(kind: ToastKind, title: string, message: string) {
+    toastSequence.current += 1;
+    const toast = { id: toastSequence.current, kind, title, message } satisfies Toast;
+    setToasts((current) => [...current.slice(-2), toast]);
+  }
+
+  function dismissToast(id: number) {
+    setToasts((current) => current.filter((toast) => toast.id !== id));
+  }
+
+  useEffect(() => {
+    const currentToast = toasts[0];
+    if (!currentToast) return undefined;
+    const timeout = window.setTimeout(() => dismissToast(currentToast.id), 5200);
+    return () => window.clearTimeout(timeout);
+  }, [toasts]);
 
   function validateIdentity() {
     const errors: typeof identityErrors = {};
@@ -55,108 +67,117 @@ export default function App() {
     if (/^\d{10}/.test(normalized)) setAntIdentification(normalized.slice(0, 10));
   }
 
-  async function submitTaxpayer(event: React.FormEvent) {
+  async function submitTaxpayer(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!validateIdentity()) return;
+    if (!validateIdentity()) {
+      pushToast('error', 'Revisa los datos', 'Completa un correo válido y un RUC de 13 dígitos.');
+      return;
+    }
     setTaxpayer({ data: null, loading: true, error: null });
     try {
-      setTaxpayer({ data: await getTaxpayer(ruc.trim(), email.trim()), loading: false, error: null });
+      const data = await getTaxpayer(ruc.trim(), email.trim());
+      setTaxpayer({ data, loading: false, error: null });
+      pushToast('success', 'Contribuyente consultado', 'Datos recibidos desde SRI.');
     } catch (error) {
-      setTaxpayer({ data: null, loading: false, error: readableError(error) });
+      const message = readableError(error);
+      setTaxpayer({ data: null, loading: false, error: message });
+      pushToast('error', 'Consulta de contribuyente no disponible', message);
     }
   }
 
-  async function submitVehicle(event: React.FormEvent) {
+  async function submitVehicle(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!normalizedPlate || !/^[A-Z0-9]{3,8}$/.test(normalizedPlate)) {
-      setPlateError('La placa debe tener entre 3 y 8 caracteres alfanuméricos.');
+      const message = 'La placa debe tener entre 3 y 8 caracteres alfanuméricos.';
+      setPlateError(message);
+      pushToast('error', 'Revisa la placa', message);
       return;
     }
     setPlateError(null);
     setVehicle({ data: null, loading: true, error: null });
     try {
-      setVehicle({ data: await getVehicle(normalizedPlate), loading: false, error: null });
+      const data = await getVehicle(normalizedPlate);
+      setVehicle({ data, loading: false, error: null });
+      pushToast('success', 'Vehículo consultado', 'Pagos reportados recibidos desde SRI.');
     } catch (error) {
-      setVehicle({ data: null, loading: false, error: readableError(error) });
+      const message = readableError(error);
+      setVehicle({ data: null, loading: false, error: message });
+      pushToast('error', 'Consulta de vehículo no disponible', message);
     }
   }
 
-  async function submitAnt(event: React.FormEvent) {
+  async function submitAnt(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!/^\d{10}$/.test(antIdentification)) {
-      setAnt({ data: null, loading: false, error: 'La identificación ANT debe tener 10 dígitos.' });
+      const message = 'La identificación ANT debe tener 10 dígitos.';
+      setAnt({ data: null, loading: false, error: message });
+      pushToast('error', 'Revisa la identificación', message);
       return;
     }
     setAnt({ data: null, loading: true, error: null });
     try {
-      setAnt({ data: await getAntPoints(antIdentification, scenario), loading: false, error: null });
+      const data = await getAntPoints(antIdentification, scenario);
+      setAnt({ data, loading: false, error: null });
+      if (data.stale) {
+        pushToast('warning', 'Resultado ANT en contingencia', 'Se muestra el último resultado válido con su fecha original.');
+      } else if (data.points === null) {
+        pushToast('warning', 'ANT sin resultados', 'No se reportaron puntos para esta identificación.');
+      } else {
+        pushToast('success', 'Consulta ANT lista', `Fuente ${data.source}.`);
+      }
     } catch (error) {
-      setAnt({ data: null, loading: false, error: readableError(error) });
+      const message = readableError(error);
+      setAnt({ data: null, loading: false, error: message });
+      pushToast('error', 'Consulta ANT no disponible', 'La consulta falló; revisa el detalle mostrado en la tarjeta.');
     }
+  }
+
+  const activeStep: ProgressStepId = ant.loading || ant.data || ant.error ? 'ant' : vehicle.loading || vehicle.data || vehicle.error ? 'vehicle' : 'taxpayer';
+  const statuses: Record<ProgressStepId, ProgressStatus> = {
+    taxpayer: taxpayer.loading ? 'loading' : taxpayer.error ? 'error' : taxpayer.data ? 'success' : 'idle',
+    vehicle: vehicle.loading ? 'loading' : vehicle.error ? 'error' : vehicle.data ? 'success' : 'idle',
+    ant: ant.loading ? 'loading' : ant.error ? 'error' : ant.data ? 'success' : 'idle',
+  };
+
+  function handleNavigate(step: ProgressStepId) {
+    const sectionId = step === 'taxpayer' ? 'contribuyente' : step === 'vehicle' ? 'vehiculo' : 'ant';
+    const section = document.getElementById(sectionId);
+    const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    section?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
   }
 
   return (
     <div className="app-shell">
       <header className="topbar">
-        <div className="brand-mark" aria-hidden="true">TC</div>
+        <div className="brand-mark" aria-hidden="true"><Icon name="spark" size={19} /></div>
         <div><span className="eyebrow">CONSULTAS ECUADOR</span><strong>TallerC4</strong></div>
-        <span className="topbar-note">SRI · ANT</span>
+        <span className="topbar-note"><span className="status-pulse" aria-hidden="true" /> 3 consultas conectadas</span>
       </header>
 
       <main className="page-content">
-        <section className="hero">
+        <section className="hero reveal">
           <div>
             <span className="eyebrow accent">DATOS EN UN SOLO LUGAR</span>
-            <h1>TallerC4: consulta tributaria y vehicular, sin perder el contexto.</h1>
-            <p className="hero-copy">Valida un RUC en SRI, revisa los pagos reportados para una placa y conoce el estado de la consulta ANT con su procedencia visible.</p>
+            <h1>TallerC4: consulta Ecuador con contexto.</h1>
+            <p className="hero-copy">Valida SRI, revisa una placa y consulta ANT con su fuente y estado visibles en todo momento.</p>
+            <div className="hero-meta"><span><Icon name="check" size={14} /> SRI integrado</span><span><Icon name="shield" size={14} /> ANT trazable</span></div>
           </div>
           <div className="hero-graphic" aria-hidden="true"><span>01</span><span>02</span><span>03</span></div>
         </section>
 
-        <section className="panel workflow-panel">
-          <div className="panel-heading"><div><span className="step-number">01</span><div><span className="eyebrow">IDENTIDAD TRIBUTARIA</span><h2>Comienza con el contribuyente</h2></div></div><span className="required-note">* Campos obligatorios</span></div>
-          <form onSubmit={submitTaxpayer} noValidate>
-            <div className="field-grid two-columns">
-              <label className="field">Correo electrónico <span className="required">*</span>
-                <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="persona@ejemplo.com" aria-invalid={Boolean(identityErrors.email)} />
-                {identityErrors.email && <span className="field-error">{identityErrors.email}</span>}
-              </label>
-              <label className="field">RUC <span className="required">*</span>
-                <input inputMode="numeric" value={ruc} onChange={(event) => handleRuc(event.target.value)} placeholder="13 dígitos" maxLength={13} aria-invalid={Boolean(identityErrors.ruc)} />
-                {identityErrors.ruc && <span className="field-error">{identityErrors.ruc}</span>}
-              </label>
-            </div>
-            <div className="form-actions"><span className="helper">La existencia y los datos se consultan directamente en SRI.</span><button type="submit" disabled={taxpayer.loading}>{taxpayer.loading ? 'Consultando…' : 'Consultar contribuyente'}</button></div>
-          </form>
-          <ErrorMessage>{taxpayer.error}</ErrorMessage>
-          {taxpayer.data && <article className="result-card result-taxpayer" aria-label="Resultado del contribuyente"><div className="result-card-header"><div><span className="eyebrow">RESULTADO SRI</span><h3>{taxpayer.data.legalName}</h3></div><StatusBadge tone="success">{taxpayer.data.status}</StatusBadge></div><dl className="detail-grid"><div><dt>RUC</dt><dd>{taxpayer.data.ruc}</dd></div><div><dt>Tipo</dt><dd>{taxpayer.data.taxpayerType}</dd></div><div><dt>Régimen</dt><dd>{taxpayer.data.regime ?? 'No disponible'}</dd></div><div><dt>Actividad principal</dt><dd>{taxpayer.data.mainEconomicActivity ?? 'No disponible'}</dd></div></dl></article>}
-        </section>
+        <ProgressNav activeStep={activeStep} statuses={statuses} onNavigate={handleNavigate} />
 
-        <div className="content-grid">
-          <section className="panel workflow-panel">
-            <div className="panel-heading"><div><span className="step-number">02</span><div><span className="eyebrow">VEHÍCULO</span><h2>Revisa una placa</h2></div></div></div>
-            <form onSubmit={submitVehicle} noValidate>
-              <label className="field">Placa <span className="required">*</span><input value={plate} onChange={(event) => setPlate(event.target.value)} placeholder="ABC1234" maxLength={8} aria-invalid={Boolean(plateError)} />{plateError && <span className="field-error">{plateError}</span>}</label>
-              <div className="form-actions"><span className="helper">SRI devuelve los pagos reportados disponibles.</span><button type="submit" disabled={vehicle.loading}>{vehicle.loading ? 'Consultando…' : 'Consultar vehículo'}</button></div>
-            </form>
-            <ErrorMessage>{vehicle.error}</ErrorMessage>
-            {vehicle.data && <article className="result-card" aria-label="Resultado del vehículo"><div className="result-card-header"><div><span className="eyebrow">RESULTADO SRI</span><h3>{vehicle.data.plate}</h3></div><StatusBadge tone="success">Encontrado</StatusBadge></div><dl className="detail-grid"><div><dt>Marca</dt><dd>{vehicle.data.brand ?? 'No disponible en este reporte'}</dd></div><div><dt>Modelo</dt><dd>{vehicle.data.model ?? 'No disponible en este reporte'}</dd></div><div><dt>Año</dt><dd>{vehicle.data.modelYear ?? 'No disponible'}</dd></div><div><dt>Pagos reportados</dt><dd>{vehicle.data.paymentCount}</dd></div></dl></article>}
-          </section>
-
-          <section className="panel workflow-panel ant-panel">
-            <div className="panel-heading"><div><span className="step-number">03</span><div><span className="eyebrow">MOVILIDAD</span><h2>Consulta puntos ANT</h2></div></div></div>
-            <form onSubmit={submitAnt} noValidate>
-              <label className="field">Identificación para ANT <span className="required">*</span><input inputMode="numeric" value={antIdentification} onChange={(event) => setAntIdentification(event.target.value.replace(/\D/g, '').slice(0, 10))} placeholder="10 dígitos" maxLength={10} /></label>
-              <label className="field">Escenario de demostración <select value={scenario} onChange={(event) => setScenario(event.target.value)}><option value="success">Éxito</option><option value="no-results">Sin resultados</option><option value="bad-gateway">HTTP 502</option><option value="timeout">Timeout</option><option value="invalid-response">Respuesta inválida</option></select><span className="select-note">Se usa cuando el backend está en modo simulado.</span></label>
-              <div className="form-actions"><span className="helper">La fuente y el estado stale aparecerán en el resultado.</span><button type="submit" disabled={ant.loading}>{ant.loading ? 'Consultando…' : 'Consultar puntos ANT'}</button></div>
-            </form>
-            <ErrorMessage>{ant.error}</ErrorMessage>
-            {ant.data && <article className="result-card result-ant" aria-label="Resultado ANT"><div className="result-card-header"><div><span className="eyebrow">RESULTADO ANT</span>{ant.data.points === null ? <h3>Sin puntos disponibles</h3> : <h3>{ant.data.points} puntos</h3>}</div><div className="badge-stack"><StatusBadge tone={ant.data.stale ? 'warning' : ant.data.simulated ? 'neutral' : 'success'}>{ant.data.stale ? 'Datos stale' : ant.data.simulated ? 'Simulado' : 'En vivo'}</StatusBadge>{ant.data.stale && <span className="stale-dot" aria-label="Advertencia de datos stale">●</span>}</div></div><p className="result-note">{ant.data.note ?? `Fuente: ${ant.data.source}`}</p><dl className="detail-grid"><div><dt>Fuente</dt><dd>{ant.data.source}</dd></div><div><dt>Consultado</dt><dd>{formatDate(ant.data.retrievedAt)}</dd></div>{ant.data.staleSince && <div><dt>Datos stale desde</dt><dd>{formatDate(ant.data.staleSince)}</dd></div>}</dl>{ant.data.stale && <p className="stale-warning" role="status"><strong>Advertencia:</strong> ANT no respondió. Este resultado proviene del último cache elegible y puede estar desactualizado.</p>}</article>}
-          </section>
+        <div className="query-stack">
+          <TaxpayerQueryCard state={taxpayer} email={email} ruc={ruc} onEmailChange={setEmail} onRucChange={handleRuc} identityErrors={identityErrors} onSubmit={submitTaxpayer} />
+          <div className="content-grid">
+            <VehicleQueryCard state={vehicle} plate={plate} plateError={plateError} onPlateChange={setPlate} onSubmit={submitVehicle} />
+            <AntQueryCard state={ant} identification={antIdentification} scenario={scenario} onIdentificationChange={(value) => setAntIdentification(value.replace(/\D/g, '').slice(0, 10))} onScenarioChange={setScenario} onSubmit={submitAnt} />
+          </div>
         </div>
 
         <footer className="page-footer"><span>TallerC4 · Diseño y Arquitectura de Software</span><span>Los datos de proveedores se muestran con su procedencia.</span></footer>
       </main>
+      <ToastViewport toasts={toasts} onDismiss={dismissToast} />
     </div>
   );
 }

@@ -10,6 +10,10 @@ describe('TallerC4 app shell', () => {
   it('shows the Spanish query heading and required fields', () => {
     render(<App />);
     expect(screen.getByRole('heading', { name: /tallerc4/i })).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: /progreso de consultas/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /ir a contribuyente/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /ir a vehículo/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /ir a ant/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/correo/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/ruc/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/placa/i)).toBeInTheDocument();
@@ -42,6 +46,38 @@ describe('TallerC4 app shell', () => {
     fireEvent.click(screen.getByRole('button', { name: /consultar puntos ant/i }));
     expect(await screen.findByText('30 puntos')).toBeInTheDocument();
     expect(screen.getByText('Simulado', { exact: true })).toBeInTheDocument();
+  });
+
+  it('announces a successful ANT query with a toast and expandable result', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({
+      identification: '0000000011', points: 30, source: 'ANT_SIMULATED', simulated: true, stale: false,
+      retrievedAt: '2026-11-17T20:00:00Z', staleSince: null, note: 'Resultado de demostración',
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+    render(<App />);
+    fireEvent.change(screen.getByLabelText(/identificación para ant/i), { target: { value: '0000000011' } });
+    fireEvent.click(screen.getByRole('button', { name: /consultar puntos ant/i }));
+    expect(await screen.findByText(/consulta ant lista/i)).toBeInTheDocument();
+    expect(screen.getByText('Ver detalles', { exact: true })).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Ver detalles', { exact: true }));
+    expect(screen.getByText('Ocultar detalles', { exact: true })).toBeInTheDocument();
+  });
+
+  it('shows an accessible loading state while ANT is pending', async () => {
+    let resolveResponse: (response: Response) => void = () => undefined;
+    const pendingResponse = new Promise<Response>((resolve) => { resolveResponse = resolve; });
+    vi.spyOn(globalThis, 'fetch').mockReturnValue(pendingResponse);
+    render(<App />);
+    fireEvent.change(screen.getByLabelText(/identificación para ant/i), { target: { value: '0000000011' } });
+    fireEvent.click(screen.getByRole('button', { name: /consultar puntos ant/i }));
+    const loadingButton = await screen.findByRole('button', { name: /consultando puntos ant/i });
+    expect(loadingButton).toBeDisabled();
+    expect(loadingButton).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByText(/consultando datos/i)).toBeInTheDocument();
+    resolveResponse(new Response(JSON.stringify({
+      identification: '0000000011', points: 30, source: 'ANT_SIMULATED', simulated: true, stale: false,
+      retrievedAt: '2026-11-17T20:00:00Z', staleSince: null, note: 'Resultado de demostración',
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+    await screen.findByText('30 puntos');
   });
 
   it('announces stale ANT data and unavailable errors', async () => {
